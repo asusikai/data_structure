@@ -5,7 +5,7 @@
 #define COL 16
 
 char maze[ROW][COL];
-int cp[ROW*COL][2]; //좌표 row,col
+int cp[ROW*COL][2]; //좌표 row,col 순서쌍 stack
 int top = -1;
 
 int IsEnd();
@@ -17,7 +17,7 @@ int* pop();
 
 
 void move(int cp[][2], char visited[][COL]); //입력값에 따라 위치 변경해주는 함수
-int IsBlocked(int cp[][2], char visited[][COL]);
+int IsBlocked(int cp[][2], char visited[][COL]); //막혔는지 체크하는 함수 -결과적으로 사용안함 ㅠㅠ
 /////////////////////////////////////////////////////////////////////////////////
 int main()
 {
@@ -43,34 +43,28 @@ int main()
     {
         fgets(input, sizeof(input), f);
         strcpy(maze[i], input);
-        //strcpy(screen[i], input);
     }
 
     fclose(f);
-    
+
     int start[2] = {1,1};
 
-    push(start);
+    push(start); // 1,1 에서 시작
     printf("start: %d,%d\n", start[0],start[1]);
 
     
-    //while(!IsEnd())
-
-    for(i=0; i<40; i++)
+    while(!IsEnd()) //7,13 만나기 전까지
     {
         move(cp, v);
-        printf("m_current pos: %d, %d\n", cp[top][0], cp[top][1]);
-        while(IsBlocked(cp, v))
-        {
-            pop();
-            printf("back\nb_current pos: %d, %d\n", cp[top][0], cp[top][1]);
-        }
+        printf("m_current pos: %d, %d\n", cp[top][0], cp[top][1]); // 현재 좌표 출력
+
     }
     
-    printf("route :\n");
+    printf("====================\n");
+    printf("route(stack) :\n");
     for(i=0; i<top; i++)
     {
-        printf("%d, %d\n",cp[i][0],cp[i][1]);
+        printf("(%d, %d)\t",cp[i][0],cp[i][1]);
     }
 
 
@@ -142,14 +136,14 @@ void move(int cp[][2], char visited[][COL])
     curr[1] = cp[top][1];
     
     int next[2];
-    printf("v:%c\n", visited[curr[0]][curr[1]]);
-    printf("m:%c\n", maze[curr[0]][curr[1]]);
     visited[curr[0]][curr[1]] = '1';
+    printf("v(%d,%d):%c\n",curr[0],curr[1], visited[curr[0]][curr[1]]); //좌표의 visited 여부
+    
     if((visited[curr[0]-1][curr[1]] == '0') && (maze[curr[0]-1][curr[1]] == '0')) // 위방향이 둘다 0이면
     {
         next[0]= curr[0]-1;
         next[1]= curr[1];
-        //printf("next: %d, %d\n", next[0], next[1]);
+        
         push(next);
         printf("move up\n");
     }
@@ -158,7 +152,7 @@ void move(int cp[][2], char visited[][COL])
     {
         next[0]= curr[0]+1;
         next[1]= curr[1];
-        //printf("next: %d, %d\n", next[0], next[1]);
+        
         push(next);
         printf("move down\n");
     }
@@ -167,7 +161,7 @@ void move(int cp[][2], char visited[][COL])
     {
         next[0]= curr[0];
         next[1]= curr[1]-1;
-        //printf("next: %d, %d\n", next[0], next[1]);
+        
         push(next);
         printf("move left\n");
     }
@@ -178,24 +172,25 @@ void move(int cp[][2], char visited[][COL])
     {
         next[0]= curr[0];
         next[1]= curr[1]+1;
-        //printf("next: %d, %d\n", next[0], next[1]);
+
         push(next);
         printf("move right\n");
     }
 
-    else
+    else // 네방향 모두 막히면
     {
-        printf("no move\n");
+        pop();
+        printf("move backward\n");
     }
 
 }
 
 int IsBlocked(int cp[][2], char visited[][COL])
 {
-    if((visited[cp[top][0]-1][cp[top][1]] == '1' || maze[cp[top][0]-1][cp[top][1]] == '1')\
-    &&(visited[cp[top][0]+1][cp[top][1]] == '1' || maze[cp[top][0]+1][cp[top][1]] == '1')\
-    &&(visited[cp[top][0]][cp[top][1]-1] == '1' || maze[cp[top][0]][cp[top][1]-1] == '1')\
-    &&(visited[cp[top][0]][cp[top][1]+1] == '1' || maze[cp[top][0]][cp[top][1]+1] == '1'))
+    if((visited[cp[top][0]-1][cp[top][1]] != '0' || maze[cp[top][0]-1][cp[top][1]] == '1')\
+    &&(visited[cp[top][0]+1][cp[top][1]] != '0' || maze[cp[top][0]+1][cp[top][1]] == '1')\
+    &&(visited[cp[top][0]][cp[top][1]-1] != '0' || maze[cp[top][0]][cp[top][1]-1] == '1')\
+    &&(visited[cp[top][0]][cp[top][1]+1] != '0' || maze[cp[top][0]][cp[top][1]+1] == '1'))
     {
         return 1;
     }
