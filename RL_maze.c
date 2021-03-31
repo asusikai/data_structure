@@ -34,6 +34,7 @@ void clear_S();
 
 void RL();
 void print_S();
+void print_U();
 
 int random_num(int n); // 0 ~ n-1 사이의 난수 return
 
@@ -74,13 +75,13 @@ int main()
     clear_S();
     print_S();
     int count_RL;
-    for(count_RL=0; count_RL<10; count_RL++)
+    //for(count_RL=0; count_RL<9; count_RL++)
     {
         RL();
+        print_S();
+        print_U();
     }
-    print_S();
-
-
+    
 
 
     return 0;
@@ -143,88 +144,6 @@ int* pop()
 }
 
 
-void move(int cp[][2], char visited[][COL])
-{
-    int curr[2];
-    curr[0] = cp[top][0];
-    curr[1] = cp[top][1];
-    //CS = S[curr[0]][curr[1]];
-    int next[2];
-    visited[curr[0]][curr[1]] = '1';
-    printf("v(%d,%d):%c\n",curr[0],curr[1], visited[curr[0]][curr[1]]); //좌표의 visited 여부
-    
-    if((visited[curr[0]-1][curr[1]] == '0') && (maze[curr[0]-1][curr[1]] == '0')) // 위방향이 둘다 0이면
-    {
-        next[0]= curr[0]-1;
-        next[1]= curr[1];
-        
-        push(next);
-        printf("move up\n");
-        //현재 좌표 S.up 에 다음 좌표 S.value*0.9 더하기
-        S[curr[0]][curr[1]].up =  S[curr[0]-1][curr[1]].value * 0.9;
-    }
-
-    else if((visited[curr[0]+1][curr[1]] == '0') && (maze[curr[0]+1][curr[1]] == '0')) // 아래방향이 둘다 0이면
-    {
-        next[0]= curr[0]+1;
-        next[1]= curr[1];
-        
-        push(next);
-        printf("move down\n");
-        //현재 좌표 S.up 에 다음 좌표 S.value*0.9 더하기
-        S[curr[0]][curr[1]].up =  S[curr[0]+1][curr[1]].value * 0.9;
-    }
-
-    else if((visited[curr[0]][curr[1]-1] == '0') && (maze[curr[0]][curr[1]-1] == '0')) // 왼방향이 둘다 0이면
-    {
-        next[0]= curr[0];
-        next[1]= curr[1]-1;
-        
-        push(next);
-        printf("move left\n");
-        //현재 좌표 S.up 에 다음 좌표 S.value*0.9 더하기
-        S[curr[0]][curr[1]].up =  S[curr[0]][curr[1]-1].value * 0.9;
-    }
-    
-
-
-    else if((visited[curr[0]][curr[1]+1] == '0') && (maze[curr[0]][curr[1]+1] == '0')) // 오른방향이 둘다 0이면
-    {
-        next[0]= curr[0];
-        next[1]= curr[1]+1;
-
-        push(next);
-        printf("move right\n");
-        //현재 좌표 S.up 에 다음 좌표 S.value*0.9 더하기
-        S[curr[0]][curr[1]].up =  S[curr[0]][curr[1]+1].value * 0.9;
-    }
-
-    else // 네방향 모두 막히면
-    {
-        //현재 위치의 value -10해주고 pop
-        S[curr[0]][curr[1]].value -= 10;
-        pop();
-        printf("move backward\n");
-    }
-
-}
-
-int IsBlocked(int cp[][2], char visited[][COL])
-{
-    if((visited[cp[top][0]-1][cp[top][1]] != '0' || maze[cp[top][0]-1][cp[top][1]] == '1')\
-    &&(visited[cp[top][0]+1][cp[top][1]] != '0' || maze[cp[top][0]+1][cp[top][1]] == '1')\
-    &&(visited[cp[top][0]][cp[top][1]-1] != '0' || maze[cp[top][0]][cp[top][1]-1] == '1')\
-    &&(visited[cp[top][0]][cp[top][1]+1] != '0' || maze[cp[top][0]][cp[top][1]+1] == '1'))
-    {
-        return 1;
-    }
-
-    else
-    {
-        return 0;
-    }
-}
-
 void RL() // 강화학습 1회
 {
     int curr[2], next[2], dir; // curr - 현재 좌표 저장, next - 다음 좌표 저장, dir - 방향 지정
@@ -244,16 +163,19 @@ void RL() // 강화학습 1회
         if(temp < S[curr[0]][curr[1]].down)
         {
             dir = 1;
+            temp = S[curr[0]][curr[1]].down;
         }
 
         if(temp < S[curr[0]][curr[1]].left)
         {
             dir = 2;
+            temp = S[curr[0]][curr[1]].left;
         }
 
         if(temp < S[curr[0]][curr[1]].right)
         {
             dir = 3;
+            temp = S[curr[0]][curr[1]].right;
         }
 
         if(dir == 0) //up
@@ -262,13 +184,13 @@ void RL() // 강화학습 1회
             if(curr[0] == 0)
             {
                 S[curr[0]][curr[1]].up -= 100;
-                break;
+
             }
             //목표 값에 도달했을 경우
             else if(curr[0]-1 == (ROW-2) && curr[1] == (COL-2))
             {
                 S[curr[0]][curr[1]].up =  S[curr[0]-1][curr[1]].value * 0.9;
-                break;
+
             }
             
             else
@@ -293,13 +215,13 @@ void RL() // 강화학습 1회
             if(curr[0] == COL-1)
             {
                 S[curr[0]][curr[1]].down -= 100;
-                break;
+
             }
             //목표 값에 도달했을 경우
             else if(curr[0]+1 == (ROW-2) && curr[1] == (COL-2))
             {
                 S[curr[0]][curr[1]].down =  S[curr[0]+1][curr[1]].value * 0.9;
-                break;
+
             }
 
             else
@@ -329,7 +251,6 @@ void RL() // 강화학습 1회
             else if(curr[0] == (ROW-2) && curr[1]-1 == (COL-2))
             {
                 S[curr[0]][curr[1]].left =  S[curr[0]][curr[1]-1].value * 0.9;
-                break;
             }
 
             else
@@ -351,7 +272,7 @@ void RL() // 강화학습 1회
         else if(dir == 3) //right
         {
             // 미로 밖으로 떨어질 경우
-            if(curr[1] == ROW-1)
+            if(curr[1] == COL-1)
             {
                 S[curr[0]][curr[1]].right -= 100;
             }
@@ -359,7 +280,6 @@ void RL() // 강화학습 1회
             else if(curr[0] == (ROW-2) && curr[1]+1 == (COL-2))
             {
                 S[curr[0]][curr[1]].right =  S[curr[0]][curr[1]+1].value * 0.9;
-                break;
             }
 
             else
@@ -389,14 +309,14 @@ int random_num(int n)
 
 void print_S()
 {
-    printf("\nRL\n");
+    printf("\nRL-value\n");
     printf("=================================\n");
     int i,j;
     for(i=0; i<ROW; i++)
     {
         for(j=0; j<COL; j++)
         {
-            printf("%.3f  ", S[i][j].value);
+            printf("%8.1f  ", S[i][j].value);
         }
         printf("\n");
     }
@@ -417,4 +337,20 @@ void clear_S()
     //a,b의 State는 value를 설정한다
 
     S[ROW-2][COL-2].value = 100;
+}
+
+void print_U()
+{
+    printf("\nRL-up\n");
+    printf("=================================\n");
+    int i,j;
+    for(i=0; i<ROW; i++)
+    {
+        for(j=0; j<COL; j++)
+        {
+            printf("%8.1f  ", S[i][j].up);
+        }
+        printf("\n");
+    }
+    printf("=================================");
 }
