@@ -16,6 +16,7 @@ int IsFull();
 int IsEmpty();
 void push(int pos[2]);
 int* pop();
+void start();
 
 void move(int cp[][2], char visited[][COL]); //입력값에 따라 위치 변경해주는 함수
 int IsBlocked(int cp[][2], char visited[][COL]); //막혔는지 체크하는 함수 -결과적으로 사용안함 ㅠㅠ
@@ -67,17 +68,16 @@ int main()
 
     fclose(f);
 
-    int start[2] = {1,1};
-
-    push(start); // 1,1 에서 시작
-    printf("start: %d,%d\n", start[0],start[1]);
+    
 //
     clear_S();
     print_S();
     int count_RL;
-    //for(count_RL=0; count_RL<9; count_RL++)
+    for(count_RL=0; count_RL<9; count_RL++)
     {
+        start(); // 1,1 에서 시작
         RL();
+        printf("%d\n",count_RL+1);
         print_S();
         print_U();
     }
@@ -135,6 +135,7 @@ void push(int pos[2])
         cp[top][1] = pos[1];
     }
 }
+
 int* pop()
 {
     if(!IsEmpty())
@@ -143,21 +144,29 @@ int* pop()
     }
 }
 
+void start()
+{
+    int start[2] = {1,1};
+    top = -1;
+    push(start);
+}
+
 
 void RL() // 강화학습 1회
 {
     int curr[2], next[2], dir; // curr - 현재 좌표 저장, next - 다음 좌표 저장, dir - 방향 지정
     float temp;
 //value 가 높은 액션 찾기
-
-    while(1)
+    int i;
+    while(i<10)
     {    
         //// 현재 state의 up, down, left, right의 값
         curr[0] = cp[top][0];
         curr[1] = cp[top][1];
+        printf("current position: %d,%d\n",curr[0],curr[1]);
 
         //state S[ROW][COL] 안의 값 비교
-        temp = S[curr[0]][curr[1]].up;
+        temp = S[curr[0]][curr[1]].up; // action value 저장 후, 비교
         dir = 0;
 
         if(temp < S[curr[0]][curr[1]].down)
@@ -178,27 +187,32 @@ void RL() // 강화학습 1회
             temp = S[curr[0]][curr[1]].right;
         }
 
+        printf("dir:%d\n", dir);
+
         if(dir == 0) //up
         {
             // 미로 밖으로 떨어질 경우
             if(curr[0] == 0)
             {
                 S[curr[0]][curr[1]].up -= 100;
-
+                printf("go up and fall.\n");
+                break;
             }
             //목표 값에 도달했을 경우
             else if(curr[0]-1 == (ROW-2) && curr[1] == (COL-2))
             {
                 S[curr[0]][curr[1]].up =  S[curr[0]-1][curr[1]].value * 0.9;
-
+                printf("go up and fin.\n");
+                break;
             }
             
             else
             {
                 // 다음 좌표의 maze 값 따라 value 변화
-                if(maze[curr[0]-1][curr[1]] == '1')
+                if(maze[curr[0]-1][curr[1]] == '1') //간 곳이 벽일 경우
                 {
                     S[curr[0]-1][curr[1]].value -=10;
+                    printf("go up - wall.\n");
                 }
 
                 //현재 좌표 S.up 에 다음 좌표 S.value*0.9 더하기 -> 함수화 해보기
@@ -206,6 +220,7 @@ void RL() // 강화학습 1회
                 next[0]= curr[0]-1;
                 next[1]= curr[1];
                 push(next);
+                printf("push done.\n");
             }
         }
 
@@ -215,12 +230,16 @@ void RL() // 강화학습 1회
             if(curr[0] == COL-1)
             {
                 S[curr[0]][curr[1]].down -= 100;
+                printf("go down and fall.\n");
+                break;
 
             }
             //목표 값에 도달했을 경우
             else if(curr[0]+1 == (ROW-2) && curr[1] == (COL-2))
             {
                 S[curr[0]][curr[1]].down =  S[curr[0]+1][curr[1]].value * 0.9;
+                printf("go down and fin.\n");
+                break;
 
             }
 
@@ -230,6 +249,7 @@ void RL() // 강화학습 1회
                 if(maze[curr[0]+1][curr[1]] == '1')
                 {
                     S[curr[0]+1][curr[1]].value -=10;
+                    printf("go down - wall.\n");
                 }
 
                 //현재 좌표 S.down 에 다음 좌표 S.value*0.9 더하기
@@ -237,6 +257,7 @@ void RL() // 강화학습 1회
                 next[0]= curr[0]+1;
                 next[1]= curr[1];
                 push(next);
+                printf("push done.\n");
             }
         }
 
@@ -246,11 +267,15 @@ void RL() // 강화학습 1회
             if(curr[1] == 0)
             {
                 S[curr[0]][curr[1]].left -= 100;
+                printf("go left and fall.\n");
+                break;
             }
             //목표 값에 도달했을 경우
             else if(curr[0] == (ROW-2) && curr[1]-1 == (COL-2))
             {
                 S[curr[0]][curr[1]].left =  S[curr[0]][curr[1]-1].value * 0.9;
+                printf("go left and fin.\n");
+                break;
             }
 
             else
@@ -259,6 +284,7 @@ void RL() // 강화학습 1회
                 if(maze[curr[0]][curr[1]-1] == '1')
                 {
                     S[curr[0]][curr[1]-1].value -=10;
+                    printf("go left - wall.\n");
                 }
 
                 //현재 좌표 S.left 에 다음 좌표 S.value*0.9 더하기
@@ -266,6 +292,7 @@ void RL() // 강화학습 1회
                 next[0]= curr[0];
                 next[1]= curr[1]-1;
                 push(next);
+                printf("push done.\n");
             }
         }
 
@@ -275,11 +302,15 @@ void RL() // 강화학습 1회
             if(curr[1] == COL-1)
             {
                 S[curr[0]][curr[1]].right -= 100;
+                printf("go right and fall.\n");
+                break;
             }
             //목표 값에 도달했을 경우
             else if(curr[0] == (ROW-2) && curr[1]+1 == (COL-2))
             {
                 S[curr[0]][curr[1]].right =  S[curr[0]][curr[1]+1].value * 0.9;
+                printf("go right and fin.\n");
+                break;
             }
 
             else
@@ -288,14 +319,17 @@ void RL() // 강화학습 1회
                 if(maze[curr[0]][curr[1]+1] == '1')
                 {
                     S[curr[0]][curr[1]+1].value -=10;
+                    printf("go right - wall.\n");
                 }
                 //현재 좌표 S.right 에 다음 좌표 S.value*0.9 더하기
                 S[curr[0]][curr[1]].right =  S[curr[0]][curr[1]+1].value * 0.9;
                 next[0]= curr[0];
                 next[1]= curr[1]+1;
                 push(next);
+                printf("push done.\n");
             }
         }
+        i++;
     }
     //액션 하면서 value 값 수정 
 }
