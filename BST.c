@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define MAX_QUEUE_SIZE 40
 
 typedef struct tree_node *tree_ptr;
@@ -14,8 +15,8 @@ tree_ptr Queue[MAX_QUEUE_SIZE];
 
 void searchBST(tree_ptr t, int key);
 void insertBST(tree_ptr t, int key);
-void deleteBST();
-int find_smallest(tree_ptr t);
+void deleteBST(tree_ptr t, int key);
+tree_ptr find_smallest(tree_ptr t);
 
 int front = 0;
 int rear = 0; // 전역변수 선언
@@ -42,10 +43,18 @@ int main()
     searchBST(root,7);
     searchBST(root,12);
 
+    
     printf("print in levelorder.\n");
     levelOrder(root);
-    deleteBST(root, 7);
+    
+    deleteBST(root, 6);
     deleteBST(root ,20);
+
+    printf("print in levelorder.\n");
+    front = 0;
+    rear = 0;
+    memset(Queue, 000000, MAX_QUEUE_SIZE*sizeof(tree_ptr));
+    //000000 -> NULL값
     levelOrder(root);
 }
 
@@ -99,18 +108,28 @@ void deleteBST(tree_ptr t, int key)
 
         else // t->data == key
         {
-            int temp = t->data;
-            t->data = find_smallest(t->right);
-            printf("%d delete -> %d\n", temp, t->data);
+            if(t->right != NULL)
+            {
+                tree_ptr temp_ptr = find_smallest(t->right);
+                printf("%d delete -> %d\n", t->data, temp_ptr->left->data);
+                t->data = temp_ptr->left->data;
+                free(temp_ptr->left);
+                temp_ptr->left = NULL;
+            }
+            else
+            {
+                printf("nothing to replace\n");
+            }
+            
             
         }
     }
 }
-int find_smallest(tree_ptr t)
+tree_ptr find_smallest(tree_ptr t)
 {
-    if(t->left == NULL)
+    if(t->left->left == NULL)
     {
-        return t->data;
+        return t;
     }
     else
     {
@@ -193,25 +212,25 @@ tree_ptr Dequeue()
 
 void levelOrder(tree_ptr ptr)
 {
-	if (!ptr)
+	if (ptr == NULL)
 		return;
 	
 	Enqueue(ptr);  
 
 	while (1) {
 		ptr = Dequeue();
-		if (ptr)
+		if(ptr != NULL)
 		{
 			printf("%d ", ptr->data);
 
-			if (ptr->left)
+			if(ptr->left != NULL)
 				Enqueue(ptr->left);
                 
-			if (ptr->right)
+			if(ptr->right != NULL)
 				Enqueue(ptr->right);
-                
 		}
 		else
 			break; 
 	}
+    printf("\n");
 }
