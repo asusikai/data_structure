@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1619098426 source:c:\users\ansj0\desktop\ÀÚ±¸\midterm\grade_assign\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

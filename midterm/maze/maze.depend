@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1619084349 source:c:\users\ansj0\desktop\ÀÚ±¸\midterm\maze\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
