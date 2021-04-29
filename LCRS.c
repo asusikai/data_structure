@@ -16,6 +16,10 @@ ptr root, current;
 
 void insert_node(char name[], char type);
 
+void del_file(char name[]);
+void free_dir(ptr dir);
+void del_dir(char name[]);
+
 void change_dir(ptr p, char name[]);
 
 void print_preorder(ptr p);
@@ -29,28 +33,24 @@ int main()
     root->sib = NULL;
 
     current = root;
-
-    printf("print LCRS\n");
-    print_preorder(root);
     
-    insert_node("doc1", 'f');
-    insert_node("assignments", 'd');
-    printf("print LCRS\n");
+    insert_node("bskim", 'd');
+    change_dir(root, "bskim");
+    insert_node("homework1", 'f');
+
+    printf("\nprint LCRS before delete\n");
     print_preorder(root);
 
-    change_dir(root,"assignments");
-    insert_node("doc2", 'f');
-    insert_node("doc3", 'f');
+    change_dir(root, "bskim");
+    del_file("homework1");
 
-    printf("print LCRS\n");
+    printf("\nprint LCRS after delete file\n");
     print_preorder(root);
 
-    change_dir(root,"root");
-    insert_node("doc4", 'f');
-    insert_node("doc4", 'f');
-    insert_node("assignments", 'd');
+    change_dir(root, "root");
+    del_dir("bskim");
 
-    printf("print LCRS\n");
+    printf("\nprint LCRS after delete directory\n");
     print_preorder(root);
 
 
@@ -127,6 +127,80 @@ void change_dir(ptr p, char name[])
 
 }
 
+void del_file(char name[])
+{
+    ptr temp = current;
+    ptr t = current->child;
+
+    while(t != NULL && (strcmp(t->name, name) != 0 || t->type != 'f'))
+    {
+        temp = t;
+        t = t->sib;
+    }
+
+    if(t == NULL)
+    {
+        printf("there is no file called %s in this directory.\n", name);
+    }
+
+    else
+    {
+        if(temp == current)
+        {
+            temp->child = t->sib;
+            free(t);
+        }
+
+        else
+        {
+            temp->sib = t->sib;
+            free(t);
+        }
+    }
+
+}
+
+void free_dir(ptr dir)
+{
+    if(dir != NULL)
+    {
+        free_dir(dir->sib);
+        free_dir(dir->child);
+        free(dir);
+    }
+}
+
+void del_dir(char name[])
+{
+    ptr temp = current;
+    ptr t = current->child;
+
+    while(t != NULL && (strcmp(t->name, name) != 0 || t->type != 'd'))
+    {
+        temp = t;
+        t = t->sib;
+    }
+
+    if(t == NULL)
+    {
+        printf("There is no directory called %s in this directory.\n", name);
+    }
+
+    else
+    {
+        if(temp == current)
+        {
+            temp->child = t->sib;
+            free_dir(t);
+        }
+
+        else
+        {
+            temp->sib = t->sib;
+            free_dir(t);
+        }
+    }
+}
 
 void print_preorder(ptr p)
 {
