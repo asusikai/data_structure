@@ -5,9 +5,6 @@ int heap[25];
 int top = 0;
 
 void swap(int *a, int *b);
-
-void insertheap(int item);
-
 void insert_heap(int e);
 int remove_heap();
 void print_heap();
@@ -33,25 +30,6 @@ void swap(int *a, int *b)
     *b = tem;
 }
 
-void insertheap(int item)
-{
-	int i, temp;
-	heap[++top] = item;
-	i = top;
-	while (i / 2 >= 1)
-	{
-		if (heap[i] > heap[i / 2])
-		{
-			temp = heap[i];
-			heap[i] = heap[i / 2];  
-			heap[i / 2] = temp;
-			i = i / 2;
-		}
-		else
-			break;
-	}
-}
-
 void insert_heap(int e)
 {
     int temp;
@@ -63,9 +41,7 @@ void insert_heap(int e)
     {
         if(heap[i]>heap[i/2])
         {
-            temp = heap[i];
-            heap[i] = heap[i/2];
-            heap[i/2] = temp;
+            swap(&heap[i], &heap[i/2]);
             i = i/2;
         }
 
