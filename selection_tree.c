@@ -52,8 +52,6 @@ int main()
     {
         printf("%d\n", result_array[i]);
     }
-    
-    
 
     return 0;
 }
@@ -190,3 +188,12 @@ void new_set(int j)
     }
 
 }
+
+/*
+leaf node에 7개 숫자 enque
+작은 수부터 오름차순으로 정렬
+첫번째 set-> 모든 leaf node 숫자 deque
+min 값 root로 보내고 result array에 넣는다.
+leaf node que에서 같은 값 search
+min 값이 있던 que에서 하나더 deque
+*/
