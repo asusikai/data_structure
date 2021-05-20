@@ -33,44 +33,36 @@ void build_max_heap(int);
 
 int main()
 {
-
-    int t, tc;
     int nv, ne;
-    int i;
 
+    // input the number of vertices and edges.
+    nv = 14;
+    ne = 21;
 
-    tc = 1;
+    insert_info(0,1,2,2);
+    insert_info(1,1,3,4);
+    insert_info(2,1,4,10);
+    insert_info(3,2,5,8);
+    insert_info(4,3,4,15);
+    insert_info(5,3,6,3);
+    insert_info(6,3,7,13);
+    insert_info(7,4,5,18);
+    insert_info(8,4,7,6);
+    insert_info(9,5,8,11);
+    insert_info(10,6,9,20);
+    insert_info(11,7,10,5);
+    insert_info(12,7,12,14);
+    insert_info(13,8,10,16);
+    insert_info(14,8,11,12);
+    insert_info(15,9,12,11);
+    insert_info(16,10,13,17);
+    insert_info(17,10,14,22);
+    insert_info(18,11,14,1);
+    insert_info(19,12,13,19);
+    insert_info(20,13,14,24);
 
-    for( t = 0 ; t < tc ; t ++)
-    {
-        // input the number of vertices and edges.
-        nv = 14;
-        ne = 21;
-
-        insert_info(0,1,2,2);
-        insert_info(1,1,3,4);
-        insert_info(2,1,4,10);
-        insert_info(3,2,5,8);
-        insert_info(4,3,4,15);
-        insert_info(5,3,6,3);
-        insert_info(6,3,7,13);
-        insert_info(7,4,5,18);
-        insert_info(8,4,7,6);
-        insert_info(9,5,8,11);
-        insert_info(10,6,9,20);
-        insert_info(11,7,10,5);
-        insert_info(12,7,12,14);
-        insert_info(13,8,10,16);
-        insert_info(14,8,11,12);
-        insert_info(15,9,12,11);
-        insert_info(16,10,13,17);
-        insert_info(17,10,14,22);
-        insert_info(18,11,14,1);
-        insert_info(19,12,13,19);
-        insert_info(20,13,14,24);
-
-        mst_kruskal( nv, ne);
-    }
+    mst_kruskal( nv, ne);
+    
 
     return 0;
 
